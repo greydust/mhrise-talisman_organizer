@@ -159,9 +159,16 @@ local function isBetter(talisman1, talisman2)
     return false
 end
 
+local function sendMessage(total, locked)
+    local chatManager = sdk.get_managed_singleton("snow.gui.ChatManager")
+    local msg = "Organized " .. total .. " talismans.\nLocked " .. locked
+    chatManager:call("reqAddChatInfomation", msg, 0)
+end
+
 local function organizeTalisman()
     logString = ''
 
+    local count = 0
     local data = sdk.get_managed_singleton('snow.data.DataManager')
     if data then
         local equipBox = data:get_field('_PlEquipBox')
@@ -172,8 +179,10 @@ local function organizeTalisman()
                 for id = 0, equipList:call("get_Count") - 1, 1 do
                     local equip = equipList:call("get_Item", id)
                     if equip:get_field('_IdType') == 3 then
+                        count = count + 1
                         equip:call('set_IsLock', false)
                         noBetter = true
+
                         for tId in pairs(bests) do
                             talisman = equipList:call("get_Item", tonumber(tId))
                             if isBetter(talisman, equip) then
@@ -197,12 +206,15 @@ local function organizeTalisman()
                     end
                 end
 
+                local lockedCount = 0
                 for id in pairs(bests) do
                     local equip = equipList:call("get_Item", tonumber(id))
                     equip:call('set_IsLock', true)
+                    lockedCount = lockedCount + 1
                 end
 
-                debug.outputLog()
+                sendMessage(count, lockedCount)
+                debug.outputLog(count, lockedCount)
             end
         end
     end
