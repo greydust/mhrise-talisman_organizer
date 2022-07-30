@@ -161,7 +161,7 @@ end
 
 local function sendMessage(total, locked)
     local chatManager = sdk.get_managed_singleton("snow.gui.ChatManager")
-    local msg = "Organized " .. total .. " talismans.\nLocked " .. locked
+    local msg = "Organized " .. total .. " talismans.\nLocked " .. locked .. '.'
     chatManager:call("reqAddChatInfomation", msg, 0)
 end
 
