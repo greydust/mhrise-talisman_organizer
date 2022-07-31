@@ -8,10 +8,23 @@ local THE_MORE_THE_BETTER_TEXT = 'The more the better'
 local KEEP_EVERY_LEVEL = 2
 local KEEP_EVERY_LEVEL_TEXT = 'Keep every level'
 local KEEP_OPTIONS = {THE_MORE_THE_BETTER_TEXT, KEEP_EVERY_LEVEL_TEXT}
+local LANGUAGES = {
+    default = 'NotoSans-Regular.ttf',
+    ar = 'NotoSansArabic-Regular.ttf',
+    ja = 'NotoSansJP-Regular.otf',
+    kr = 'NotoSansKR-Regular.otf',
+    ['zh-cn'] = 'NotoSansSC-Regular.otf',
+    ['zh-tw'] = 'NotoSansTC-Regular.otf',
+}
+local LANGUAGE_OPTIONS = {'default', 'ar', 'ja', 'kr', 'zh-cn', 'zh-tw'}
+local FONT_RANGE = { 0x1, 0xFFFF, 0 }
 
 local skillDecorationData = json.load_file('talisman_organizer/skill_decoration_data.json')
 
-local settings = {}
+local settings = {
+    language = 1,
+}
+local loadedFonts = {}
 
 local debug = require("talisman_organizer.debug")
 debug.setup(getSkillName)
@@ -44,6 +57,9 @@ local function loadSettings()
             end
         end
 	end
+    if loadedSettings.language then
+        settings.language = loadedSettings.language
+    end
 end
 
 initSettings()
@@ -223,23 +239,37 @@ end
 local settingsWindow = false
 re.on_draw_ui(function()
     if imgui.tree_node('Talisman Organizer') then
+        changed, value = imgui.combo('Language', settings.language, LANGUAGE_OPTIONS)
+        if changed then
+            settings.language = value
+            saveSettings()
+        end
+
         if imgui.button('Talisman Organizer settings') then
             settingsWindow = not settingsWindow
         end
 
+        local currentLanguage = LANGUAGE_OPTIONS[settings.language]
+        if not loadedFonts[currentLanguage] then
+            loadedFonts[currentLanguage] = imgui.load_font(LANGUAGES[currentLanguage], 18, FONT_RANGE)
+        end
         if imgui.begin_window('Talisman Organizer settings', settingsWindow, 0) then
             for i = 1, skillIdType:get_field('PlEquipSkillId_Max'):get_data(), 1 do
                 local skillId = tostring(i)
                 local skillName = getSkillName:call(nil, i)
                 if skillName ~= '' then
                     imgui.begin_group()
+
+                    imgui.push_font(loadedFonts[currentLanguage])
                     changed, value = imgui.checkbox("Want " .. skillName, settings[skillId].want)
                     if changed then
                         settings[skillId].want = value
                         saveSettings()
                     end
+                    imgui.pop_font()
+
                     imgui.same_line()
-                    changed, value = imgui.combo(skillName, settings[skillId].keep, KEEP_OPTIONS)
+                    changed, value = imgui.combo(skillId, settings[skillId].keep, KEEP_OPTIONS)
                     if changed then
                         settings[skillId].keep = value
                         saveSettings()
