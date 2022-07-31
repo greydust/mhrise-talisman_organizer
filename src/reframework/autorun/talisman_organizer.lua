@@ -233,9 +233,7 @@ re.on_draw_ui(function()
                 local skillName = getSkillName:call(nil, i)
                 if skillName ~= '' then
                     imgui.begin_group()
-                    imgui.text(skillName)
-                    imgui.same_line()
-                    changed, value = imgui.checkbox("Want", settings[skillId].want)
+                    changed, value = imgui.checkbox("Want " .. skillName, settings[skillId].want)
                     if changed then
                         settings[skillId].want = value
                         saveSettings()

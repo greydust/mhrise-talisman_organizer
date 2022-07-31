@@ -56,7 +56,7 @@ local function logTalisman(talisman)
         end
     end
     if lv1 > 0 then
-        for i = 0, lv1, 1 do
+        for i = 1, lv1, 1 do
             decoString = decoString .. '1,'
         end
     end
