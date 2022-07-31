@@ -57,7 +57,7 @@ local function loadSettings()
             end
         end
 	end
-    if loadedSettings.language then
+    if loadedSettings and loadedSettings.language then
         settings.language = loadedSettings.language
     end
 end
