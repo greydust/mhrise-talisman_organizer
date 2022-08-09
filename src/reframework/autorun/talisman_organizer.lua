@@ -38,7 +38,7 @@ re.on_draw_ui(function()
             setting.SaveSettings()
         end
 
-        if imgui.button('Talisman Organizer settings') then
+        if imgui.button('Talisman Organizer Settings') then
             settingsWindow = not settingsWindow
         end
 
@@ -46,7 +46,7 @@ re.on_draw_ui(function()
         if not loadedFonts[currentLanguage] then
             loadedFonts[currentLanguage] = imgui.load_font(LANGUAGES[currentLanguage], 18, FONT_RANGE)
         end
-        if imgui.begin_window('Talisman Organizer settings', settingsWindow, 0) then
+        if imgui.begin_window('Talisman Organizer Settings', settingsWindow, 0) then
             for i = 1, SKILL_ID_MAX, 1 do
                 local skillId = tostring(i)
                 local skillName = getSkillName:call(nil, i)
@@ -76,7 +76,7 @@ re.on_draw_ui(function()
             settingsWindow = false
         end
 
-        if imgui.button('Organize talisman') then
+        if imgui.button('Organize Talismans') then
             organizer.OrganizeTalisman()
         end
 

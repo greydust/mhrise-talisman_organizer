@@ -25,7 +25,7 @@ function NativeUI.draw()
         organizer.OrganizeTalisman()
     end
 
-    if modUI.Button(skillSettingButtonLabel, '', true, 'WARNING: this list contains all of the skills.') then
+    if modUI.Button(skillSettingButtonLabel, '', true, 'WARNING: This list contains all of the skills.') then
         detail = not detail
         updateSkillSettingLabel()
     end
