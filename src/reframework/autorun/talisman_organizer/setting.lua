@@ -42,4 +42,4 @@ function Setting.LoadSettings()
     end
 end
 
-return Settings
+return Setting
