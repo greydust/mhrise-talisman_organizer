@@ -18,5 +18,4 @@ function Util.SafeRequire(name)
     return nil
 end
 
-
 return Util

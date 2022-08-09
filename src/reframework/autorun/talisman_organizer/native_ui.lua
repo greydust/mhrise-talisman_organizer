@@ -9,7 +9,6 @@ local getSkillName = sdk.find_type_definition('snow.data.DataShortcut'):get_meth
 local skillIdType = sdk.find_type_definition('snow.data.DataDef.PlEquipSkillId')
 local SKILL_ID_MAX = skillIdType:get_field('PlEquipSkillId_Max'):get_data()
 
-
 local detail = false
 local skillSettingButtonLabel = 'Open skill settings'
 local function updateSkillSettingLabel()
