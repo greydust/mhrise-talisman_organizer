@@ -83,3 +83,7 @@ re.on_draw_ui(function()
         imgui.tree_pop();
     end
 end)
+
+re.on_config_save(function()
+	setting.SaveSettings();
+end)
