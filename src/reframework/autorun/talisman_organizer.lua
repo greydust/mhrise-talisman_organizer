@@ -12,6 +12,7 @@ local enableController = false
 local enableKeyboard = false
 local enabledKeybinding = false
 
+-- Ready up Keyboard and Pad Binding Settings
 re.on_pre_application_entry("UpdateBehavior", function() 
     if not hwKB then
         hwKB = sdk.get_managed_singleton("snow.GameKeyboard"):get_field("hardKeyboard")
@@ -21,12 +22,11 @@ re.on_pre_application_entry("UpdateBehavior", function()
     end
 end)
 
+-- Update on Keybind click
 re.on_frame(function()
     if (hwKB:call("getTrg", kbToggleKey) and enableKeyboard) or (hwPad:call("orTrg", padToggleBtn) and enableController) then
         if enabledKeybinding then
-            enabledKeybinding = false
-        else
-            enabledKeybinding = true
+            organizer.OrganizeTalisman()
         end
     end
 end)
@@ -117,12 +117,6 @@ re.on_draw_ui(function()
 				changed, enableKeyboard = imgui.checkbox("Keyboard (default: [HOME])", enableKeyboard)
                 imgui.tree_pop()
             end
-
-            if not enabledKeybinding then
-                organizer.OrganizeTalisman()
-            end
-
-            imgui.tree_pop()
         end
 
         if imgui.button('Organize Talismans') then
