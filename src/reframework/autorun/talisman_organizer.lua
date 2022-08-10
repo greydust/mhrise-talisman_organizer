@@ -29,7 +29,7 @@ re.on_frame(function()
             enabledKeybinding = true
         end
     end
-)
+end)
 
 local debug = require("talisman_organizer.debug")
 local nativeUI = require('talisman_organizer.native_ui')
