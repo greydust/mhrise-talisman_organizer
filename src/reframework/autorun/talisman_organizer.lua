@@ -1,5 +1,6 @@
 -- Keybinding Variables
--- Copied from Infinite Wirebugs
+-- Some are coppied from Infinite Wirebug Mod
+-- Special Thanks to: Fylex and godoakos.
 require("talisman_organizer.key_enums")
 
 local hwKB = nil
