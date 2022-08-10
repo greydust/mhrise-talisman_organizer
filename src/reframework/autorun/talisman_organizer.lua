@@ -12,25 +12,6 @@ local enableController = false
 local enableKeyboard = false
 local enabledKeybinding = false
 
--- Ready up Keyboard and Pad Binding Settings
-re.on_pre_application_entry("UpdateBehavior", function() 
-    if not hwKB then
-        hwKB = sdk.get_managed_singleton("snow.GameKeyboard"):get_field("hardKeyboard")
-    end
-    if not hwPad then
-        hwPad = sdk.get_managed_singleton("snow.Pad"):get_field("hard")
-    end
-end)
-
--- Update on Keybind click
-re.on_frame(function()
-    if (hwKB:call("getTrg", kbToggleKey) and enableKeyboard) or (hwPad:call("orTrg", padToggleBtn) and enableController) then
-        if enabledKeybinding then
-            organizer.OrganizeTalisman()
-        end
-    end
-end)
-
 local debug = require("talisman_organizer.debug")
 local nativeUI = require('talisman_organizer.native_ui')
 local organizer = require('talisman_organizer.organizer')
@@ -63,6 +44,26 @@ setting.LoadSettings()
 nativeUI.Init()
 
 local settingsWindow = false
+
+-- Ready up Keyboard and Pad Binding Settings
+re.on_pre_application_entry("UpdateBehavior", function() 
+    if not hwKB then
+        hwKB = sdk.get_managed_singleton("snow.GameKeyboard"):get_field("hardKeyboard")
+    end
+    if not hwPad then
+        hwPad = sdk.get_managed_singleton("snow.Pad"):get_field("hard")
+    end
+end)
+
+-- Update on Keybind click
+re.on_frame(function()
+    if (hwKB:call("getTrg", kbToggleKey) and enableKeyboard) or (hwPad:call("orTrg", padToggleBtn) and enableController) then
+        if enabledKeybinding then
+            organizer.OrganizeTalisman()
+        end
+    end
+end)
+
 re.on_draw_ui(function()
     if imgui.tree_node('Talisman Organizer') then
         changed, value = imgui.combo('Language', setting.Settings.language, LANGUAGE_OPTIONS)
