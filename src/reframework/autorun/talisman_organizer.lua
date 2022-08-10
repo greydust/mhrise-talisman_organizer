@@ -1,3 +1,36 @@
+-- Keybinding Variables
+-- Copied from Infinite Wirebugs
+require("talisman_organizer.key_enums")
+
+local hwKB = nil
+local kbToggleKey = 36 -- Default: [HOME]
+
+local hwPad = nil
+local padToggleKey = 4096 -- Default: [L3/LS]
+
+local enableController = false
+local enableKeyboard = false
+local enabledKeybinding = false
+
+re.on_pre_application_entry("UpdateBehavior", function() 
+    if not hwKB then
+        hwKB = sdk.get_managed_singleton("snow.GameKeyboard"):get_field("hardKeyboard")
+    end
+    if not hwPad then
+        hwPad = sdk.get_managed_singleton("snow.Pad"):get_field("hard")
+    end
+)
+
+re.on_frame(function()
+    if (hwKB:call("getTrg", kbToggleKey) and enableKeyboard) or (hwPad:call("orTrg", padToggleBtn) and enableController) then
+        if enabledKeybinding then
+            enabledKeybinding = false
+        else
+            enabledKeybinding = true
+        end
+    end
+)
+
 local debug = require("talisman_organizer.debug")
 local nativeUI = require('talisman_organizer.native_ui')
 local organizer = require('talisman_organizer.organizer')
@@ -74,6 +107,22 @@ re.on_draw_ui(function()
             imgui.end_window()
         else
             settingsWindow = false
+        end
+        
+        -- Added Keybinding Option
+        if imgui.tree_node("Keybinding") then
+            changed, enabledKeybinding = imgui.checkbox("Enable", enabledKeybinding)
+            if imgui.tree_node("Shortcut keys") then
+                changed, enableController = imgui.checkbox("Controller (default: [LS/L3])", enableController)
+				changed, enableKeyboard = imgui.checkbox("Keyboard (default: [HOME])", enableKeyboard)
+                imgui.tree_pop()
+            end
+
+            if not enabledKeybinding then
+                organizer.OrganizeTalisman()
+            end
+
+            imgui.tree_pop()
         end
 
         if imgui.button('Organize Talismans') then
