@@ -57,7 +57,7 @@ end)
 
 -- Update on Keybind click
 re.on_frame(function()
-    if (hwKB:call("getTrg", kbToggleKey) and enableKeyboard) or (hwPad:call("orTrg", padToggleBtn) and enableController) then
+    if (hwKB:call("getTrg", kbToggleKey) and enableKeyboard) or (hwPad:call("orTrg", padToggleKey) and enableController) then
         if enabledKeybinding then
             organizer.OrganizeTalisman()
         end
