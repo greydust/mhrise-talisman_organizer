@@ -19,7 +19,7 @@ re.on_pre_application_entry("UpdateBehavior", function()
     if not hwPad then
         hwPad = sdk.get_managed_singleton("snow.Pad"):get_field("hard")
     end
-)
+end)
 
 re.on_frame(function()
     if (hwKB:call("getTrg", kbToggleKey) and enableKeyboard) or (hwPad:call("orTrg", padToggleBtn) and enableController) then
