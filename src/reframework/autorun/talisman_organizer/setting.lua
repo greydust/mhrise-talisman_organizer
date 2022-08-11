@@ -3,9 +3,10 @@ local util = require('talisman_organizer.util')
 local Setting = {
     Settings = {
         language = 1,
-        enabled = false,
-        enableController = false,
+        enableGamepad = false,
+        gamepadShortcut = 8192,
         enableKeyboard = false,
+        keyboardShortcut = 36,
     },
 }
 
@@ -32,28 +33,29 @@ end
 function Setting.LoadSettings()
 	local loadedSettings = json.load_file('talisman_organizer.json')
 	if loadedSettings then
-        for skillId, loadedSetting in pairs(loadedSettings) do
-            if type(loadedSetting) == 'table' and type(Setting.Settings[skillId]) == 'table' then
-                for k, v in pairs(loadedSetting) do
-                    Setting.Settings[skillId][k] = v
-                end
+        util.DeepCopy(Setting.Settings, loadedSettings)
+    end
+end
+
+function Setting.UpdateKeyBinding()
+    if util.Settings.SettingGamepadShortcut then
+        Setting.Settings.gamepadShortcut = 0
+        local button = util.HardwareGamepad:get_field('_on')
+        if button > 0 and util.PadButton[button] ~= nil then
+            Setting.Settings.gamepadShortcut = button
+            util.Settings.SettingGamepadShortcut = false
+            Setting.SaveSettings()
+        end
+    end
+    if util.Settings.SettingKeyboardShortcut then
+        Setting.Settings.keyboardShortcut = 0
+        for k, _ in pairs(util.KeyboardKey) do
+            if util.HardwareKeyboard:call("getTrg", k) then
+                Setting.Settings.keyboardShortcut = k
+                util.Settings.SettingKeyboardShortcut = false
+                Setting.SaveSettings()
+                break
             end
-        end
-        if loadedSettings.language then
-            Setting.Settings.language = loadedSettings.language
-        end
-
-        -- Keybinding Settings
-        if loadedSettings.enabled then
-            Setting.Settings.enabled = loadedSettings.enabled
-        end
-
-        if loadedSettings.enableKeyboard then
-            Setting.Settings.enableKeyboard = loadedSettings.enableKeyboard
-        end
-
-        if loadedSettings.enableController then
-            Setting.Settings.enableController = loadedSettings.enableController
         end
     end
 end

@@ -25,6 +25,28 @@ function NativeUI.draw()
         organizer.OrganizeTalisman()
     end
 
+    changed, value = modUI.CheckBox('Enable Gamepad Shortcut', setting.Settings.enableGamepad)
+    if changed then
+        setting.Settings.enableGamepad = value
+        setting.SaveSettings()
+    end
+    if modUI.Button('Gamepad Shortcut', util.PadButton[setting.Settings.gamepadShortcut], false) then
+        if util.HardwareGamepad then
+            util.Settings.SettingGamepadShortcut = true
+        end
+    end
+
+    changed, value = modUI.CheckBox('Enable Keyboard Shortcut', setting.Settings.enableKeyboard)
+    if changed then
+        setting.Settings.enableKeyboard = value
+        setting.SaveSettings()
+    end
+    if modUI.Button('Keyboard Shortcut', util.KeyboardKey[setting.Settings.keyboardShortcut], false) then
+        if util.HardwareKeyboard then
+            util.Settings.SettingKeyboardShortcut = true
+        end
+    end
+
     if modUI.Button(skillSettingButtonLabel, '', true, 'WARNING: This list contains all of the skills.') then
         detail = not detail
         updateSkillSettingLabel()
