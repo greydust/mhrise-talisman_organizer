@@ -3,6 +3,9 @@ local util = require('talisman_organizer.util')
 local Setting = {
     Settings = {
         language = 1,
+        enabled = false,
+        enableController = false,
+        enableKeyboard = false,
     },
 }
 
@@ -38,6 +41,19 @@ function Setting.LoadSettings()
         end
         if loadedSettings.language then
             Setting.Settings.language = loadedSettings.language
+        end
+
+        -- Keybinding Settings
+        if loadedSettings.enabled then
+            Setting.Settings.enabled = loadedSettings.enabled
+        end
+
+        if loadedSettings.enableKeyboard then
+            Setting.Settings.enableKeyboard = loadedSettings.enableKeyboard
+        end
+
+        if loadedSettings.enableController then
+            Setting.Settings.enableController = loadedSettings.enableController
         end
     end
 end

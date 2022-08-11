@@ -1,3 +1,15 @@
+-- Some codes are pulled from Infinite Wirebug Mod
+-- Special Thanks to: Fylex, raffRun, and godoakos
+require("talisman_organizer.key_enum")
+-- Refer to talisman_organizer/key_enum for different keybindings
+local hwKB = nil
+local keyboardToggle = 36 -- Default button is HOME button
+
+local hwPad = nil
+local padToggle = 8192 -- Default button is RS/R3 button
+
+local enabled
+
 local debug = require("talisman_organizer.debug")
 local nativeUI = require('talisman_organizer.native_ui')
 local organizer = require('talisman_organizer.organizer')
@@ -30,6 +42,27 @@ setting.LoadSettings()
 nativeUI.Init()
 
 local settingsWindow = false
+
+-- Copied from Infinite Wirebug Mod
+re.on_pre_application_entry("UpdateBehavior", function() 
+    if not hwKB then
+        hwKB = sdk.get_managed_singleton("snow.GameKeyboard"):get_field("hardKeyboard")
+    end
+    if not hwPad then
+        hwPad = sdk.get_managed_singleton("snow.Pad"):get_field("hard")
+    end
+end)
+
+-- Copied from Infinite Wirebug Mod
+-- Edited: Organizes talisman when Keybind is pressed
+re.on_frame(function()
+    if (hwKB:call("getTrg", keyboardToggle) and setting.Settings.enableKeyboard) or (hwPad:call("orTrg", padToggle) and setting.Settings.enableController) then
+        if setting.Settings.enabled then
+            organizer.OrganizeTalisman()
+        end
+    end
+end)
+
 re.on_draw_ui(function()
     if imgui.tree_node('Talisman Organizer') then
         changed, value = imgui.combo('Language', setting.Settings.language, LANGUAGE_OPTIONS)
@@ -46,6 +79,7 @@ re.on_draw_ui(function()
         if not loadedFonts[currentLanguage] then
             loadedFonts[currentLanguage] = imgui.load_font(LANGUAGES[currentLanguage], 18, FONT_RANGE)
         end
+
         if imgui.begin_window('Talisman Organizer Settings', settingsWindow, 0) then
             for i = 1, SKILL_ID_MAX, 1 do
                 local skillId = tostring(i)
@@ -74,6 +108,37 @@ re.on_draw_ui(function()
             imgui.end_window()
         else
             settingsWindow = false
+        end
+
+        -- Keybind Tree
+        if imgui.tree_node("Keybind Shortcut") then
+            changed, enabled = imgui.checkbox("Enable", setting.Settings.enabled)
+
+            -- Save changes
+            if changed then
+                setting.Settings.enabled = enabled
+                setting.SaveSettings()
+            end
+
+            if imgui.tree_node("Keybind shortcuts") then
+                changedKB, enableKeyboard = imgui.checkbox("Keyboard (Default:[HOME])", setting.Settings.enableKeyboard)
+                changedPad, enableController = imgui.checkbox("Controller (Default: [RS/R3])", setting.Settings.enableController)
+
+                -- Save changes
+                if changedKB then
+                    setting.Settings.enableKeyboard = enableKeyboard
+                    setting.SaveSettings()
+                end
+
+                if changedPad then
+                    setting.Settings.enableController = enableController
+                    setting.SaveSettings()
+                end
+
+                imgui.tree_pop()
+            end
+
+            imgui.tree_pop()
         end
 
         if imgui.button('Organize Talismans') then
