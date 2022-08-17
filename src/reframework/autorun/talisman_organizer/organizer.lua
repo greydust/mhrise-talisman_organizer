@@ -1,4 +1,4 @@
-local debug = require("talisman_organizer.debug")
+local debug = require('talisman_organizer.debug')
 local setting = require('talisman_organizer.setting')
 
 local Organizer = {};
@@ -56,10 +56,10 @@ function Organizer.isBetter(talisman1, talisman2)
     -- compare decoration slots
     local decoLeft = {0, 0, 0, 0}
     for i = 1, 4, 1 do
-        decoLeft[i] = decoLeft[i] + decoList1:call("get_Item", i)
+        decoLeft[i] = decoLeft[i] + decoList1:call('get_Item', i)
     end
     for i = 1, 4, 1 do
-        local need = decoList2:call("get_Item", i)
+        local need = decoList2:call('get_Item', i)
         if need > 0 then
             -- we need to find a slot at least as large as the slot in talisman2
             for j = i, 4, 1 do
@@ -79,7 +79,7 @@ function Organizer.isBetter(talisman1, talisman2)
     end
 
     local skillNeeded = {}
-    for i = 0, skillIdList2:call("get_Count")-1, 1 do
+    for i = 0, skillIdList2:call('get_Count')-1, 1 do
         local skillId = tostring(skillIdList2:call('get_Item', i))
         local skillLv = lvList2:call('get_Item', i)
         if skillId and skillLv then
@@ -88,7 +88,7 @@ function Organizer.isBetter(talisman1, talisman2)
             end
         end
     end
-    for i = 0, skillIdList1:call("get_Count")-1, 1 do
+    for i = 0, skillIdList1:call('get_Count')-1, 1 do
         local skillId = tostring(skillIdList1:call('get_Item', i))
         local skillLv = lvList1:call('get_Item', i)
         if skillId and skillLv then
@@ -117,47 +117,47 @@ function Organizer.isBetter(talisman1, talisman2)
 end
 
 function Organizer.sendMessage(total, locked)
-    local chatManager = sdk.get_managed_singleton("snow.gui.ChatManager")
-    local msg = "Organized " .. total .. " talismans.\nLocked " .. locked .. '.'
-    chatManager:call("reqAddChatInfomation", msg, 0)
+    local chatManager = sdk.get_managed_singleton('snow.gui.ChatManager')
+    local msg = 'Organized ' .. total .. ' talismans.\nLocked ' .. locked .. '.'
+    chatManager:call('reqAddChatInfomation', msg, 0)
 end
 
 function Organizer.OrganizeTalisman()
     logString = ''
 
-    local count = 0
     local data = sdk.get_managed_singleton('snow.data.DataManager')
     if data then
         local equipBox = data:get_field('_PlEquipBox')
         if equipBox then
             local equipList = equipBox:call('getInventoryDataList(snow.data.EquipBox.InventoryType)', 0)
             if equipList then
+                local count = 0
                 local bests = {}
-                for id = 0, equipList:call("get_Count") - 1, 1 do
-                    local equip = equipList:call("get_Item", id)
+                for id = 0, equipList:call('get_Count') - 1, 1 do
+                    local equip = equipList:call('get_Item', id)
                     if equip:get_field('_IdType') == 3 then
                         count = count + 1
                         equip:call('set_IsLock', false)
                         noBetter = true
 
                         for tId in pairs(bests) do
-                            talisman = equipList:call("get_Item", tonumber(tId))
+                            talisman = equipList:call('get_Item', tonumber(tId))
                             if Organizer.isBetter(talisman, equip) then
-                                debug.debugLog(tId .. ' is better than ' .. id .. "\n")
+                                debug.debugLog(tId .. ' is better than ' .. id .. '\n')
                                 debug.debugLog(debug.logTalisman(talisman))
                                 debug.debugLog(debug.logTalisman(equip))
                                 noBetter = false
                                 break
                             end
                             if Organizer.isBetter(equip, talisman) then
-                                debug.debugLog(id .. ' is better than ' .. tId .. "\n")
+                                debug.debugLog(id .. ' is better than ' .. tId .. '\n')
                                 debug.debugLog(debug.logTalisman(equip))
                                 debug.debugLog(debug.logTalisman(talisman))
                                 bests[tId] = nil
                             end
                         end
                         if noBetter then
-                            debug.debugLog('Add ' .. id .. " to best list\n")
+                            debug.debugLog('Add ' .. id .. ' to best list\n')
                             bests[tostring(id)] = true
                         end
                     end
@@ -165,13 +165,18 @@ function Organizer.OrganizeTalisman()
 
                 local lockedCount = 0
                 for id in pairs(bests) do
-                    local equip = equipList:call("get_Item", tonumber(id))
+                    local equip = equipList:call('get_Item', tonumber(id))
                     equip:call('set_IsLock', true)
                     lockedCount = lockedCount + 1
                 end
 
-                Organizer.sendMessage(count, lockedCount)
-                debug.outputLog(count, lockedCount)
+                if count == 0 then
+                    local chatManager = sdk.get_managed_singleton('snow.gui.ChatManager')
+                    chatManager:call('reqAddChatInfomation', 'Please talk to the blacksmith first.', 0)
+                else
+                    Organizer.sendMessage(count, lockedCount)
+                    debug.outputLog(count, lockedCount)
+                end
             end
         end
     end
