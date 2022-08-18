@@ -129,7 +129,7 @@ function Organizer.OrganizeTalisman()
     if data then
         local equipBox = data:get_field('_PlEquipBox')
         if equipBox then
-            local equipList = equipBox:call('getInventoryDataList(snow.data.EquipBox.InventoryType)', 0)
+            local equipList = equipBox:get_field("_WeaponArmorInventoryList")
             if equipList then
                 local count = 0
                 local bests = {}
