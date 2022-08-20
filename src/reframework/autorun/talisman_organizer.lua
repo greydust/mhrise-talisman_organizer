@@ -34,7 +34,7 @@ re.on_pre_application_entry('UpdateBehavior', function()
         local pad = sdk.get_managed_singleton('snow.Pad')
         if pad then
             util.HardwareGamepad = pad:get_field('hard')
-            padType = util.HardwareGamepad:get_field('_DeviceKindDetails')
+            local padType = util.HardwareGamepad:get_field('_DeviceKindDetails')
             if padType ~= nil then
                 if padType >= 5 and padType <= 9 then
                     util.PadButton = require('talisman_organizer.input.ps_button')
@@ -76,7 +76,7 @@ end)
 local settingsWindow = false
 re.on_draw_ui(function()
     if imgui.tree_node('Talisman Organizer') then
-        changed, value = imgui.combo('Language', setting.Settings.language, LANGUAGE_OPTIONS)
+        local changed, value = imgui.combo('Language', setting.Settings.language, LANGUAGE_OPTIONS)
         if changed then
             setting.Settings.language = value
             setting.SaveSettings()

@@ -25,7 +25,7 @@ function NativeUI.draw()
         organizer.OrganizeTalisman()
     end
 
-    changed, value = modUI.CheckBox('Enable Gamepad Shortcut', setting.Settings.enableGamepad)
+    local changed, value = modUI.CheckBox('Enable Gamepad Shortcut', setting.Settings.enableGamepad)
     if changed then
         setting.Settings.enableGamepad = value
         setting.SaveSettings()

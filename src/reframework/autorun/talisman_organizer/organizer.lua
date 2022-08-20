@@ -1,5 +1,6 @@
 local debug = require('talisman_organizer.debug')
 local setting = require('talisman_organizer.setting')
+local util = require('talisman_organizer.util')
 
 local Organizer = {};
 
@@ -93,7 +94,7 @@ function Organizer.isBetter(talisman1, talisman2)
         local skillLv = lvList1:call('get_Item', i)
         if skillId and skillLv then
             if skillNeeded[skillId] ~= nil then
-                if setting.Settings[skillId] and setting.Settings[skillId].keep == KEEP_EVERY_LEVEL and skillLv > skillNeeded[skillId] then
+                if setting.Settings[skillId] and setting.Settings[skillId].keep == util.Settings.KEEP_EVERY_LEVEL and skillLv > skillNeeded[skillId] then
                     return false
                 end
                 if skillLv >= skillNeeded[skillId] then
@@ -123,7 +124,7 @@ function Organizer.sendMessage(total, locked)
 end
 
 function Organizer.OrganizeTalisman()
-    logString = ''
+    local logString = ''
 
     local data = sdk.get_managed_singleton('snow.data.DataManager')
     if data then
@@ -138,10 +139,10 @@ function Organizer.OrganizeTalisman()
                     if equip:get_field('_IdType') == 3 then
                         count = count + 1
                         equip:call('set_IsLock', false)
-                        noBetter = true
+                        local noBetter = true
 
                         for tId in pairs(bests) do
-                            talisman = equipList:call('get_Item', tonumber(tId))
+                            local talisman = equipList:call('get_Item', tonumber(tId))
                             if Organizer.isBetter(talisman, equip) then
                                 debug.debugLog(tId .. ' is better than ' .. id .. '\n')
                                 debug.debugLog(debug.logTalisman(talisman))
@@ -175,8 +176,8 @@ function Organizer.OrganizeTalisman()
                     chatManager:call('reqAddChatInfomation', 'Please talk to the blacksmith first.', 0)
                 else
                     Organizer.sendMessage(count, lockedCount)
-                    debug.outputLog(count, lockedCount)
                 end
+                debug.outputLog()
             end
         end
     end
