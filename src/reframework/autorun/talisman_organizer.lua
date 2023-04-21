@@ -150,6 +150,10 @@ re.on_draw_ui(function()
             if util.HardwareKeyboard then
                 util.Settings.SettingKeyboardShortcut = true
             end
+        end        
+
+        if imgui.button('Update Skill JSON') then
+            debug.updateSkillJSON()
         end
 
         imgui.tree_pop();
