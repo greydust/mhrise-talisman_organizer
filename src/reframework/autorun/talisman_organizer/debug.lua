@@ -77,7 +77,7 @@ end
 local function updateSkillJSON()   
     local skillMap = {}
     for decoID = 1, DECO_ID_MAX - 1 do
-		local baseDeco = getBaseDeco:call(nil, decoID)
+        local baseDeco = getBaseDeco:call(nil, decoID)
         if baseDeco then
             local skillID = tostring(baseDeco:get_SkillIdList()[0].value__)
             local skillLv = baseDeco:get_SkillLvList()[0].mValue
