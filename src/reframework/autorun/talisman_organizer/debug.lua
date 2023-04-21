@@ -2,6 +2,10 @@ local debug = false
 local logString = ''
 local getSkillName = nil
 
+local SKILL_ID_MAX = sdk.find_type_definition('snow.data.DataDef.PlEquipSkillId'):get_field('PlEquipSkillId_Max'):get_data()
+local DECO_ID_MAX = sdk.find_type_definition('snow.equip.DecorationsId'):get_field('Deco_Max'):get_data()
+local getBaseDeco = sdk.find_type_definition('snow.data.ContentsIdDataManager'):get_method('getBaseData(snow.equip.DecorationsId)')
+
 local function setup(skillNameMethod)
     getSkillName = skillNameMethod
 end
@@ -70,6 +74,47 @@ local function logTalisman(talisman)
     return result
 end
 
+local function updateSkillJSON()   
+    local skillMap = {}
+    for decoID = 1, DECO_ID_MAX - 1 do
+		local baseDeco = getBaseDeco:call(nil, decoID)
+        if baseDeco then
+            local skillID = tostring(baseDeco:get_SkillIdList()[0].value__)
+            local skillLv = baseDeco:get_SkillLvList()[0].mValue
+            local decoLv = baseDeco:get_DecorationLv()
+            local skillName = getSkillName:call(nil, tonumber(skillID))
+
+            if (skillMap[skillID] == nil) then
+                skillMap[skillID] = {
+                    name = skillName,
+                    deco = {},
+                }
+            end
+            skillMap[skillID]['deco'][skillLv] = decoLv + 0.0
+        end
+    end
+
+    -- fill out any missing values with 0's
+    for skillIDIdx = 1, SKILL_ID_MAX do
+        local skillID = tostring(skillIDIdx)
+        if (skillMap[skillID] == nil) then
+            skillMap[skillID] = {
+                name = '',
+                deco = { 0.0, 0.0, 0.0, 0.0 },
+            }
+        else
+            skillDecos = skillMap[skillID]['deco']
+            for skillLv = 1, 4 do
+                if skillDecos[skillLv] == nil then
+                    skillDecos[skillLv] = 0.0
+                end
+            end
+        end
+    end
+
+    json.dump_file('talisman_organizer/skill_decoration_data.json', skillMap)
+end
+
 local function outputLog()
     if debug then
         fs.write("talisman_organizer/log.txt", logString)
@@ -80,5 +125,6 @@ return {
     debugLog = debugLog,
     logTalisman = logTalisman,
     outputLog = outputLog,
+    updateSkillJSON = updateSkillJSON,
     setup = setup,
 }
