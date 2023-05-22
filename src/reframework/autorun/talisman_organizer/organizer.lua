@@ -18,7 +18,7 @@ function Organizer.skillFillable(skillNeeded, decoLeft)
         if skillLv > 0 then
             for targetLv = skillLv, 1, -1 do
                 local decoList = skillDecorationData[skillId]['deco']
-                if #decoList <= targetLv and decoList[targetLv] and decoList[targetLv] > 0 then
+                if #decoList >= targetLv and decoList[targetLv] and decoList[targetLv] > 0 then
                     for targetDecoLv = decoList[targetLv], 4, 1 do
                         if decoLeft[targetDecoLv] > 0 then
                             skillNeeded[skillId] = skillNeeded[skillId] - targetLv
