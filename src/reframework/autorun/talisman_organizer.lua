@@ -126,6 +126,12 @@ re.on_draw_ui(function()
             settingsWindow = false
         end
 
+        changed, value = imgui.checkbox('Skip locked talismans', setting.Settings.skipLocked)
+        if changed then
+            setting.Settings.skipLocked = value
+            setting.SaveSettings()
+        end
+
         changed, value = imgui.checkbox('Enable Gamepad Shortcut', setting.Settings.enableGamepad)
         if changed then
             setting.Settings.enableGamepad = value

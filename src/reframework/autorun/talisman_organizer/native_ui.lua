@@ -25,6 +25,12 @@ function NativeUI.draw()
         organizer.OrganizeTalisman()
     end
 
+    changed, value = modUI.CheckBox('Skip locked talismans', setting.Settings.skipLocked)
+    if changed then
+        setting.Settings.skipLocked = value
+        setting.SaveSettings()
+    end
+
     local changed, value = modUI.CheckBox('Enable Gamepad Shortcut', setting.Settings.enableGamepad)
     if changed then
         setting.Settings.enableGamepad = value

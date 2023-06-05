@@ -7,6 +7,7 @@ local Setting = {
         gamepadShortcut = 8192,
         enableKeyboard = false,
         keyboardShortcut = 36,
+        skipLocked = true,
     },
 }
 

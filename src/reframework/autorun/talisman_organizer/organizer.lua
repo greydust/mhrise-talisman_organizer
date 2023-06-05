@@ -117,9 +117,9 @@ function Organizer.isBetter(talisman1, talisman2)
     return false
 end
 
-function Organizer.sendMessage(total, locked)
+function Organizer.sendMessage(total, locked, comparison)
     local chatManager = sdk.get_managed_singleton('snow.gui.ChatManager')
-    local msg = 'Organized ' .. total .. ' talismans.\nLocked ' .. locked .. '.'
+    local msg = 'Organized ' .. total .. ' talismans.\nLocked ' .. locked .. '.\n' .. comparison .. ' comparisons made.'
     chatManager:call('reqAddChatInfomation', msg, 0)
 end
 
@@ -133,28 +133,46 @@ function Organizer.OrganizeTalisman()
             local equipList = equipBox:get_field("_WeaponArmorInventoryList")
             if equipList then
                 local count = 0
+                local comparison = 0
                 local bests = {}
+
+                -- Save all locked talisman as best if skipLocked is enabled.
+                if setting.Settings.skipLocked then
+                    for id = 0, equipList:call('get_Count') - 1, 1 do
+                        local equip = equipList:call('get_Item', id)
+                        if equip:get_field('_IdType') == 3 and equip:call('get_IsLock') == true then
+                            debug.debugLog('Add ' .. id .. ' to best list\n')
+                            bests[tostring(id)] = true
+                        end
+                    end
+                end
+
                 for id = 0, equipList:call('get_Count') - 1, 1 do
                     local equip = equipList:call('get_Item', id)
                     if equip:get_field('_IdType') == 3 then
                         count = count + 1
-                        equip:call('set_IsLock', false)
-                        local noBetter = true
 
-                        for tId in pairs(bests) do
-                            local talisman = equipList:call('get_Item', tonumber(tId))
-                            if Organizer.isBetter(talisman, equip) then
-                                debug.debugLog(tId .. ' is better than ' .. id .. '\n')
-                                debug.debugLog(debug.logTalisman(talisman))
-                                debug.debugLog(debug.logTalisman(equip))
-                                noBetter = false
-                                break
-                            end
-                            if Organizer.isBetter(equip, talisman) then
-                                debug.debugLog(id .. ' is better than ' .. tId .. '\n')
-                                debug.debugLog(debug.logTalisman(equip))
-                                debug.debugLog(debug.logTalisman(talisman))
-                                bests[tId] = nil
+                        local noBetter = true
+                        if equip:call('get_IsLock') == false or not setting.Settings.skipLocked then
+                            debug.debugLog('Checking ' .. id .. '\n')
+                            equip:call('set_IsLock', false)
+
+                            for tId in pairs(bests) do
+                                comparison = comparison + 1
+                                local talisman = equipList:call('get_Item', tonumber(tId))
+                                if Organizer.isBetter(talisman, equip) then
+                                    debug.debugLog(tId .. ' is better than ' .. id .. '\n')
+                                    debug.debugLog(debug.logTalisman(talisman))
+                                    debug.debugLog(debug.logTalisman(equip))
+                                    noBetter = false
+                                    break
+                                end
+                                if Organizer.isBetter(equip, talisman) then
+                                    debug.debugLog(id .. ' is better than ' .. tId .. '\n')
+                                    debug.debugLog(debug.logTalisman(equip))
+                                    debug.debugLog(debug.logTalisman(talisman))
+                                    bests[tId] = nil
+                                end
                             end
                         end
                         if noBetter then
@@ -175,7 +193,7 @@ function Organizer.OrganizeTalisman()
                     local chatManager = sdk.get_managed_singleton('snow.gui.ChatManager')
                     chatManager:call('reqAddChatInfomation', 'Please talk to the blacksmith first.', 0)
                 else
-                    Organizer.sendMessage(count, lockedCount)
+                    Organizer.sendMessage(count, lockedCount, comparison)
                 end
                 debug.outputLog()
             end
