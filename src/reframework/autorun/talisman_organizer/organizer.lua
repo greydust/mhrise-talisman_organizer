@@ -14,21 +14,25 @@ end
 
 function Organizer.skillFillable(skillNeeded, decoLeft)
     for skillId, skillLv in pairs(skillNeeded) do
-        -- get first skill and DFS
+        -- Find the first skill that need to be filled and DFS from here.
         if skillLv > 0 then
+            -- Assuming that we're filling targetLv levels.
             for targetLv = skillLv, 1, -1 do
-                local decoList = skillDecorationData[skillId]['deco']
-                if #decoList >= targetLv and decoList[targetLv] and decoList[targetLv] > 0 then
-                    for targetDecoLv = decoList[targetLv], 4, 1 do
+                local availableDecoList = skillDecorationData[skillId]['deco']
+                local finalTargetLv = Organizer.hasDeco(availableDecoList, targetLv, setting.Settings[skillId].want == util.Settings.WANT_MORE)
+                if finalTargetLv then
+                    -- Find the smallest slot that can fit the deco.
+                    for targetDecoLv = availableDecoList[finalTargetLv], 4, 1 do
                         if decoLeft[targetDecoLv] > 0 then
-                            skillNeeded[skillId] = skillNeeded[skillId] - targetLv
+                            skillNeeded[skillId] = skillNeeded[skillId] - finalTargetLv
                             decoLeft[targetDecoLv] = decoLeft[targetDecoLv] - 1
+
                             local result = Organizer.skillFillable(skillNeeded, decoLeft)
                             if result then
                                 return result
                             end
-                            
-                            skillNeeded[skillId] = skillNeeded[skillId] + targetLv
+
+                            skillNeeded[skillId] = skillNeeded[skillId] + finalTargetLv
                             decoLeft[targetDecoLv] = decoLeft[targetDecoLv] + 1
 
                             break
@@ -37,6 +41,7 @@ function Organizer.skillFillable(skillNeeded, decoLeft)
                 end
             end
 
+            -- If we can't fill the first skill, return false.
             return false
         end
     end
@@ -44,6 +49,28 @@ function Organizer.skillFillable(skillNeeded, decoLeft)
     return true
 end
 
+-- Check the deco list for decos that match the skill level required.
+-- If it wants "the more the better", it'll look for the decos that has higher or equal level.
+-- If it wants "keep every level", it'll look for the decos that has the exact level.
+-- Returns the level of the skill on the matched deco. If none, return false.
+function Organizer.hasDeco(decoList, targetLv, moreIsBetter)
+    if #decoList < targetLv then
+        return false
+    end
+
+    if moreIsBetter then
+        for lv = targetLv, 4, 1 do
+            if decoList[lv] and decoList[lv] > 0 then
+                return lv
+            end
+        end
+    else
+        if decoList[targetLv] and decoList[targetLv] > 0 then
+            return targetLv
+        end
+    end
+    return false
+end
 
 function Organizer.isBetter(talisman1, talisman2)
     local skillIdList1 = talisman1:get_field('_TalismanSkillIdList')
