@@ -13,13 +13,15 @@ function Organizer.countTable(t)
 end
 
 function Organizer.skillFillable(skillNeeded, decoLeft)
+    debug.debugLog('  Try filling ' .. debug.dump(skillNeeded) .. ' with ' .. debug.dump(decoLeft) .. '\n')
     for skillId, skillLv in pairs(skillNeeded) do
         -- Find the first skill that need to be filled and DFS from here.
         if skillLv > 0 then
             -- Assuming that we're filling targetLv levels.
             for targetLv = skillLv, 1, -1 do
                 local availableDecoList = skillDecorationData[skillId]['deco']
-                local finalTargetLv = Organizer.hasDeco(availableDecoList, targetLv, setting.Settings[skillId].want == util.Settings.WANT_MORE)
+                local finalTargetLv = Organizer.hasDeco(availableDecoList, targetLv, setting.Settings[skillId].keep == util.Settings.THE_MORE_THE_BETTER)
+                debug.debugLog('    Filling ' .. targetLv .. ' level(s) of ' .. skillId .. '. Availability: ' .. debug.dump(finalTargetLv) .. '\n')
                 if finalTargetLv then
                     -- Find the smallest slot that can fit the deco.
                     for targetDecoLv = availableDecoList[finalTargetLv], 4, 1 do
@@ -54,6 +56,7 @@ end
 -- If it wants "keep every level", it'll look for the decos that has the exact level.
 -- Returns the level of the skill on the matched deco. If none, return false.
 function Organizer.hasDeco(decoList, targetLv, moreIsBetter)
+    debug.debugLog('      Testing deco availability for ' .. targetLv .. ' level(s) with ' .. debug.dump(decoList) .. '. moreIsBetter: ' .. debug.dump(moreIsBetter) .. '\n')
     if #decoList < targetLv then
         return false
     end

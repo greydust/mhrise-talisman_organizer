@@ -123,6 +123,7 @@ end
 
 return {
     debugLog = debugLog,
+    dump = dump,
     logTalisman = logTalisman,
     outputLog = outputLog,
     updateSkillJSON = updateSkillJSON,
